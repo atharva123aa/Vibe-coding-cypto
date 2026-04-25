@@ -1,2 +1,68 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibecoding Trader Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>🚀 VibeTrade</h2>
+            </div>
+            <ul class="nav-links">
+                <li class="active">📊 Dashboard</li>
+                <li>💼 My Portfolio</li>
+                <li>📜 History</li>
+                <li>⚙️ Settings</li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+
+            <header class="top-header">
+                <div class="greeting">
+                    <h1>Welcome back, Trader</h1>
+                    <p>Let's make some fake money today.</p>
+                </div>
+                <div class="wallet-widget">
+                    <span>Buying Power:</span>
+                    <h2 id="usd-balance">$0.00</h2>
+                </div>
+            </header>
+
+            <section class="dashboard-grid">
+
+                <div class="market-panel">
+                    <h3>Live Market</h3>
+                    <div id="coin-list" class="coin-list">
+                        <p>Loading market data...</p>
+                    </div> 
+                </div>
+
+                <div class="portfolio-panel">
+                    <h3>My Bags 🎒</h3>
+                    <div id="my-crypto-list">
+                        <p>You are broke. Buy something.</p>
+                    </div>
+                    <div class="net-worth">
+                        <h4>Total Net Worth: <span id="net-worth-display">$0.00</span></h4>
+                    </div>
+                </div>
+
+            </section>
+        </main>
+
+    </div>
+    <script src="app.js"></script>
+</body>
+
+</html>
       
