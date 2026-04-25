@@ -7,6 +7,7 @@
     <title>Vibecoding Trader Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* CSS Variables and Base Styling */
         :root {
             --bg-color: #f4f7f6;
             --sidebar-bg: #1e2b3c;
@@ -28,6 +29,7 @@
             color: var(--text-main);
         }
 
+        /* Layout Grid */
         .app-container {
             display: flex;
             min-height: 100vh;
@@ -68,6 +70,7 @@
             padding: 30px;
         }
 
+        /* Header and Panels */
         .top-header {
             display: flex;
             justify-content: space-between;
@@ -97,11 +100,12 @@
         .market-panel,
         .portfolio-panel {
             background: var(--card-bg);
-            padDing: 20px;
+            padding: 20px;
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
 
+        /* Coin UI Elements */
         .coin-row {
             display: flex;
             justify-content: space-between;
@@ -131,11 +135,19 @@
             background: var(--accent-red);
             color: white;
         }
+
+        .portfolio-item {
+            padding: 10px 0;
+            border-bottom: 1px dashed #ccc;
+            display: flex;
+            justify-content: space-between;
+        }
     </style>
 </head>
 
 <body>
     <div class="app-container">
+
         <aside class="sidebar">
             <div class="logo">
                 <h2>🚀 VibeTrade</h2>
@@ -143,42 +155,35 @@
             <ul class="nav-links">
                 <li class="active">📊 Dashboard</li>
                 <li>💼 My Portfolio</li>
-                <li>📜 History</li>
-                <li>⚙️ Settings</li>
             </ul>
         </aside>
+
         <main class="main-content">
             <header class="top-header">
                 <div class="greeting">
                     <h1>Welcome back, Trader</h1>
-                    <p>Let's make some fake money today.</p>
                 </div>
                 <div class="wallet-widget">
                     <span>Buying Power:</span>
                     <h2 id="usd-balance">$0.00</h2>
                 </div>
             </header>
+
             <section class="dashboard-grid">
                 <div class="market-panel">
                     <h3>Live Market</h3>
-                    <div id="coin-list" class="coin-list">
-                    </div>
+                    <div id="coin-list" class="coin-list"></div>
                 </div>
                 <div class="portfolio-panel">
                     <h3>My Bags 🎒</h3>
-                    <div id="my-crypto-list">
-                        <p>You are broke. Buy something.</p>
-                    </div>
-                    <div class="net-worth">
-                        <h4 style="margin-top: 15px;">Total Net Worth: <span id="net-worth-display">$0.00</span></h4>
-                    </div>
+                    <div id="my-crypto-list"></div>
                 </div>
             </section>
         </main>
     </div>
 
     <script>
-        // Array of objects makes it way easier to add new coins later
+        // 1. Data Structure
         const coins = [
             { id: 'BTC', name: 'Bitcoin', price: 62000.50, icon: '₿' },
             { id: 'ETH', name: 'Ethereum', price: 3400.25, icon: '♦' },
@@ -186,48 +191,85 @@
             { id: 'DOGE', name: 'Dogecoin', price: 0.15, icon: '🐕' }
         ];
 
-        // Setup the User State
-        let userBalance = localStorage.getItem('vibeBalance');
+        // 2. State Management (LocalStorage)
+        let userBalance = parseFloat(localStorage.getItem('vibeBalance')) || 10000.00;
+        let myPortfolio = JSON.parse(localStorage.getItem('vibePortfolio')) || { BTC: 0, ETH: 0, SOL: 0, DOGE: 0 };
 
-        if (userBalance === null) {
-            userBalance = 10000.00;
-            localStorage.setItem('vibeBalance', userBalance);
-            console.log("New user detected. Deposited $10,000.");
-        } else {
-            userBalance = parseFloat(userBalance);
+        function updateTopUI() {
+            document.getElementById('usd-balance').innerText = "$" + userBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-        // Update the top header UI
-        document.getElementById('usd-balance').innerText = "$" + userBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        // 3. The Buy Logic
+        function buyCoin(coinId) {
+            let targetCoin = coins.find(c => c.id === coinId);
+            let spendAmount = prompt(`How much USD do you want to spend on ${targetCoin.name}?`);
 
-        // Render the Market dynamically
+            spendAmount = parseFloat(spendAmount);
+
+            // Validation checks so it doesn't crash
+            if (isNaN(spendAmount) || spendAmount <= 0) {
+                alert("Please enter a valid amount.");
+                return;
+            }
+            if (spendAmount > userBalance) {
+                alert("You don't have enough USD for this trade.");
+                return;
+            }
+
+            // Math: Calculate how much crypto they get
+            let cryptoReceived = spendAmount / targetCoin.price;
+
+            // Update variables
+            userBalance -= spendAmount;
+            myPortfolio[coinId] += cryptoReceived;
+
+            // Save to localStorage
+            localStorage.setItem('vibeBalance', userBalance);
+            localStorage.setItem('vibePortfolio', JSON.stringify(myPortfolio));
+
+            // Refresh screen
+            updateTopUI();
+            renderPortfolio();
+        }
+
+        // 4. Render Market 
         function renderMarket() {
             const marketContainer = document.getElementById('coin-list');
-            marketContainer.innerHTML = ""; // clear the area
-
+            marketContainer.innerHTML = "";
             for (let i = 0; i < coins.length; i++) {
                 let coin = coins[i];
                 marketContainer.innerHTML += `
-                    <div class="coin-row" id="row-${coin.id}">
-                        <div class="coin-info">
-                            <span style="font-size: 20px;">${coin.icon}</span>
-                            <strong>${coin.name} (${coin.id})</strong>
-                        </div>
-                        <div class="coin-price">
-                            <span id="price-${coin.id}">$${coin.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                        </div>
+                    <div class="coin-row">
+                        <div class="coin-info"><span style="font-size: 20px;">${coin.icon}</span> <strong>${coin.name}</strong></div>
+                        <div class="coin-price">$${coin.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
                         <div class="coin-actions">
-                            <button class="btn btn-buy" onclick="alert('Buy logic coming in Hour 5')">Buy</button>
+                            <button class="btn btn-buy" onclick="buyCoin('${coin.id}')">Buy</button>
                             <button class="btn btn-sell" onclick="alert('Sell logic not written yet')">Sell</button>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             }
         }
 
-        // Run the render function on load
+        // 5. Render Portfolio
+        function renderPortfolio() {
+            const portContainer = document.getElementById('my-crypto-list');
+            portContainer.innerHTML = "";
+            for (const [coinId, amount] of Object.entries(myPortfolio)) {
+                portContainer.innerHTML += `
+                    <div class="portfolio-item">
+                        <span>${coinId}</span>
+                        <strong>${amount.toFixed(4)}</strong>
+                    </div>`;
+            }
+        }
+
+        // Initialize the app on load
+        updateTopUI();
         renderMarket();
+        renderPortfolio();
     </script>
 </body>
 
-</html> 
+</html>
+
+            
