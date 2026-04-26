@@ -1,14 +1,13 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VibeTrade Terminal Pro</title>
-
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Roboto+Mono:wght@500;700&display=swap"
-        rel="stylesheet"<>
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
+        rel="stylesheet">
 
     <style>
         :root {
@@ -28,13 +27,13 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
         }
 
         .mono-num {
-            font-family: 'Roboto Mono', monospace;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         .app-container {
@@ -69,6 +68,7 @@
             transition: all 0.2s;
         }
 
+        .nav-links li:hover,
         .nav-links li.active {
             background-color: #2b3139;
             color: var(--text-main);
@@ -94,12 +94,13 @@
 
         .wallet-widget span {
             color: var(--text-muted);
-            font-size: 12px;
+            font-size: 14px;
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .wallet-widget h2 {
-            color: var(--accent-green);
+            color: var(--text-main);
             font-size: 32px;
             margin-top: 5px;
         }
@@ -107,46 +108,84 @@
         .dashboard-grid {
             display: grid;
             grid-template-columns: 2fr 1fr;
-            gap: 20px;
+            gap: 24px;
+            /* tweaked gap so it breathes better */
         }
 
+        .right-col {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* UPGRADED PANELS: added floating shadow effect */
         .panel {
             background: var(--panel-bg);
-            padding: 20px;
-            border-radius: 8px;
+            padding: 24px;
+            border-radius: 12px;
             border: 1px solid var(--border-color);
-            margin-bottom: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .panel:hover {
+            transform: translateY(-2px);
+            /* tiny lift when you mouse over the whole box */
         }
 
         .panel h3 {
             color: var(--text-muted);
-            font-size: 14px;
+            font-size: 16px;
             margin-bottom: 20px;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
         .coin-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
+            padding: 16px 0;
             border-bottom: 1px solid var(--border-color);
         }
 
+        .coin-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .coin-price {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* UPGRADED BUTTONS: completely changed how they feel */
         .btn {
-            padding: 6px 12px;
+            padding: 8px 18px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
-            font-weight: 600;
-            font-size: 12px;
+            font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            /* buttons pop up when hovered */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+            /* shadow gets darker */
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+            /* actually looks like it clicks down */
         }
 
         .btn-buy {
             background: var(--accent-green);
             color: #000;
-            margin-right: 5px;
+            margin-right: 8px;
         }
 
         .btn-sell {
@@ -155,42 +194,64 @@
         }
 
         .portfolio-item {
-            padding: 10px 0;
+            padding: 12px 0;
             border-bottom: 1px dashed var(--border-color);
             display: flex;
             justify-content: space-between;
         }
 
-        /* HISTORY STYLING - spent way too much time on this part */
-        .history-list {
-            max-height: 300px;
-            overflow-y: auto;
-            font-size: 13px;
+        .portfolio-item:last-child {
+            border-bottom: none;
         }
 
-        /* custom scrollbar because the default one is ugly */
+        .history-list {
+            max-height: 250px;
+            overflow-y: auto;
+            font-size: 13px;
+            padding-right: 5px;
+        }
+
         .history-list::-webkit-scrollbar {
-            width: 4px;
+            width: 6px;
         }
 
         .history-list::-webkit-scrollbar-thumb {
-            background: var(--border-color);
+            background: #3a414a;
             border-radius: 10px;
         }
 
+        .history-list::-webkit-scrollbar-track {
+            background: var(--panel-bg);
+        }
+
         .log-entry {
-            padding: 8px 0;
-            border-bottom: 1px solid #222;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
+            align-items: center;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
         }
 
         .log-buy {
             color: var(--accent-green);
+            font-weight: bold;
         }
 
         .log-sell {
             color: var(--accent-red);
+            font-weight: bold;
+        }
+
+        .log-time {
+            color: var(--text-muted);
+            font-size: 11px;
+            background: #0b0e11;
+            padding: 4px 8px;
+            border-radius: 4px;
         }
     </style>
 </head>
@@ -203,40 +264,39 @@
                 <h2>⚡ VibeTrade</h2>
             </div>
             <ul class="nav-links">
-                <li class="active">📊 Terminal</li>
-                <li>💼 Portfolio</li>
+                <li class="active">📊 Market Data</li>
+                <li>💼 Spot Wallet</li>
                 <li>⚙️ Settings</li>
             </ul>
         </aside>
 
         <main class="main-content">
             <header class="top-header">
-                <div>
-                    <h1 style="font-size: 20px;">Trading Dashboard</h1>
-                    <p style="color: var(--text-muted); font-size: 13px;">Market Session: Active</p>
+                <div class="greeting">
+                    <h1 style="font-size: 22px;">Terminal Overview</h1>
+                    <p style="color: #848e9c; font-size: 14px; margin-top: 5px;">Status: Online & Connected</p>
                 </div>
                 <div class="wallet-widget">
-                    <span>Available Balance</span>
+                    <span>Available USD</span>
                     <h2 id="usd-balance" class="mono-num">$0.00</h2>
                 </div>
             </header>
 
             <section class="dashboard-grid">
                 <div class="panel">
-                    <h3>Market Pairs</h3>
-                    <div id="coin-list"></div>
+                    <h3>Live Markets</h3>
+                    <div id="coin-list" class="coin-list"></div>
                 </div>
 
-                <div id="right-col">
+                <div class="right-col">
                     <div class="panel">
-                        <h3>Your Assets 🎒</h3>
+                        <h3>Spot Portfolio 🎒</h3>
                         <div id="my-crypto-list" class="mono-num"></div>
                     </div>
 
                     <div class="panel">
                         <h3>Recent Activity 📜</h3>
-                        <div id="history-display" class="history-list">
-                        </div>
+                        <div id="history-display" class="history-list"></div>
                     </div>
                 </div>
             </section>
@@ -244,6 +304,7 @@
     </div>
 
     <script>
+        // Data structure
         const coins = [
             { id: 'BTC', name: 'Bitcoin', price: 62000.50, icon: '₿' },
             { id: 'ETH', name: 'Ethereum', price: 3400.25, icon: '♦' },
@@ -253,58 +314,32 @@
 
         let userBalance = parseFloat(localStorage.getItem('vibeBalance')) || 10000.00;
         let myPortfolio = JSON.parse(localStorage.getItem('vibePortfolio')) || { BTC: 0, ETH: 0, SOL: 0, DOGE: 0 };
-
-        // Load history from storage or start fresh
         let tradeHistory = JSON.parse(localStorage.getItem('vibeHistory')) || [];
 
         function updateTopUI() {
-            document.getElementById('usd-balance').innerText = "$" + userBalance.toLocaleString('en-US', { minimumFractionDigits: 2 });
+            document.getElementById('usd-balance').innerText = "$" + userBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-        // --- THE NEW LOGGING LOGIC ---
-        function addToHistory(type, amount, coin, price) {
+        function addToHistory(type, amount, coinId, price) {
             const now = new Date();
             const timeStr = now.getHours() + ":" + now.getMinutes().toString().padStart(2, '0');
 
-            const entry = {
-                type: type, // "BUY" or "SELL"
-                amount: amount,
-                coin: coin,
-                price: price,
-                time: timeStr
-            };
+            const entry = { type: type, amount: amount, coin: coinId, price: price, time: timeStr };
 
-            // add to the beginning of the array so newest is first
             tradeHistory.unshift(entry);
-
-            // keep only the last 20 trades so we don't blow up localStorage
-            if (tradeHistory.length > 20) tradeHistory.pop();
+            if (tradeHistory.length > 30) tradeHistory.pop(); // keep it clean
 
             saveData();
             renderHistory();
         }
 
-        function renderHistory() {
-            const histContainer = document.getElementById('history-display');
-            histContainer.innerHTML = "";
-
-            tradeHistory.forEach(item => {
-                const colorClass = item.type === 'BUY' ? 'log-buy' : 'log-sell';
-                histContainer.innerHTML += `
-                    <div class="log-entry">
-                        <span class="${colorClass}"><strong>${item.type}</strong> ${item.coin}</span>
-                        <span class="mono-num" style="color:var(--text-muted)">${item.time}</span>
-                    </div>
-                `;
-            });
-        }
-
         function buyCoin(coinId) {
             let targetCoin = coins.find(c => c.id === coinId);
-            let spendAmount = prompt(`Buy ${targetCoin.id}: How much USD?`);
+            let spendAmount = prompt(`How much USD do you want to spend on ${targetCoin.name}?`);
             spendAmount = parseFloat(spendAmount);
 
-            if (isNaN(spendAmount) || spendAmount <= 0 || spendAmount > userBalance) return alert("Invalid trade.");
+            if (isNaN(spendAmount) || spendAmount <= 0) return alert("Error: Invalid Amount.");
+            if (spendAmount > userBalance) return alert("Error: Insufficient USD Balance.");
 
             let cryptoReceived = spendAmount / targetCoin.price;
             userBalance -= spendAmount;
@@ -318,10 +353,12 @@
 
         function sellCoin(coinId) {
             let targetCoin = coins.find(c => c.id === coinId);
-            let sellAmount = prompt(`Sell ${targetCoin.id}: How much crypto?`);
+            let currentBag = myPortfolio[coinId].toFixed(4);
+            let sellAmount = prompt(`Selling ${targetCoin.id}. You own ${currentBag}.\nHow much crypto do you want to sell?`);
             sellAmount = parseFloat(sellAmount);
 
-            if (isNaN(sellAmount) || sellAmount <= 0 || sellAmount > myPortfolio[coinId]) return alert("Invalid trade.");
+            if (isNaN(sellAmount) || sellAmount <= 0) return alert("Error: Invalid Amount.");
+            if (sellAmount > myPortfolio[coinId]) return alert("Error: Insufficient Crypto Balance.");
 
             let usdGained = sellAmount * targetCoin.price;
             userBalance += usdGained;
@@ -342,39 +379,73 @@
         function renderMarket() {
             const marketContainer = document.getElementById('coin-list');
             marketContainer.innerHTML = "";
-            coins.forEach(coin => {
+            for (let i = 0; i < coins.length; i++) {
+                let coin = coins[i];
                 marketContainer.innerHTML += `
                     <div class="coin-row">
-                        <div>
-                            <span style="color:#fcd535; margin-right:8px">${coin.icon}</span>
-                            <strong>${coin.id}</strong>
+                        <div class="coin-info">
+                            <span style="color: #fcd535; font-size: 20px; margin-right: 10px;">${coin.icon}</span> 
+                            <strong style="font-size: 18px;">${coin.id}</strong> <span style="color: var(--text-muted); font-size: 13px; margin-left: 5px;">${coin.name}</span>
                         </div>
-                        <div class="mono-num">$${coin.price.toLocaleString()}</div>
-                        <div>
+                        <div class="coin-price mono-num">$${coin.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+                        <div class="coin-actions">
                             <button class="btn btn-buy" onclick="buyCoin('${coin.id}')">BUY</button>
                             <button class="btn btn-sell" onclick="sellCoin('${coin.id}')">SELL</button>
                         </div>
                     </div>`;
-            });
+            }
         }
 
         function renderPortfolio() {
             const portContainer = document.getElementById('my-crypto-list');
             portContainer.innerHTML = "";
-            let empty = true;
-            for (const [id, amt] of Object.entries(myPortfolio)) {
-                if (amt > 0.000001) {
-                    empty = false;
-                    portContainer.innerHTML += `<div class="portfolio-item"><span>${id}</span> <strong>${amt.toFixed(4)}</strong></div>`;
+            let hasCoins = false;
+
+            for (const [coinId, amount] of Object.entries(myPortfolio)) {
+                if (amount > 0.00001) {
+                    hasCoins = true;
+                    portContainer.innerHTML += `
+                        <div class="portfolio-item">
+                            <span style="color: var(--text-muted); font-weight: bold;">${coinId}</span>
+                            <strong>${amount.toFixed(4)}</strong>
+                        </div>`;
                 }
             }
-            if (empty) portContainer.innerHTML = "<p style='color:var(--text-muted); font-size:12px'>Empty Wallet</p>";
+
+            if (!hasCoins) {
+                portContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 14px; text-align: center; margin-top: 20px;">No assets held.</p>`;
+            }
         }
 
-        // Initialize everything
+        function renderHistory() {
+            const histContainer = document.getElementById('history-display');
+            histContainer.innerHTML = "";
+
+            if (tradeHistory.length === 0) {
+                histContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 14px; text-align: center; margin-top: 20px;">No recent trades.</p>`;
+                return;
+            }
+
+            tradeHistory.forEach(item => {
+                const colorClass = item.type === 'BUY' ? 'log-buy' : 'log-sell';
+                histContainer.innerHTML += `
+                    <div class="log-entry">
+                        <div>
+                            <span class="${colorClass}">${item.type}</span> 
+                            <span class="mono-num" style="margin-left: 8px;">${item.amount.toFixed(4)} ${item.coin}</span>
+                        </div>
+                        <div class="log-time mono-num">${item.time}</div>
+                    </div>
+                `;
+            });
+        }     
+        
+        // Initialize UI
         updateTopUI();
-        renderMarket();
+        renderMarket(); 
         renderPortfolio();
         renderHistory();
     </script>
-</body </html>
+</body>    
+    
+</html>           
