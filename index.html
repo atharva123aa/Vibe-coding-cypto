@@ -109,7 +109,6 @@
             display: grid;
             grid-template-columns: 2fr 1fr;
             gap: 24px;
-            /* tweaked gap so it breathes better */
         }
 
         .right-col {
@@ -118,7 +117,6 @@
             gap: 24px;
         }
 
-        /* UPGRADED PANELS: added floating shadow effect */
         .panel {
             background: var(--panel-bg);
             padding: 24px;
@@ -130,7 +128,6 @@
 
         .panel:hover {
             transform: translateY(-2px);
-            /* tiny lift when you mouse over the whole box */
         }
 
         .panel h3 {
@@ -156,9 +153,9 @@
         .coin-price {
             font-size: 18px;
             font-weight: bold;
+            transition: color 0.3s ease;
         }
 
-        /* UPGRADED BUTTONS: completely changed how they feel */
         .btn {
             padding: 8px 18px;
             border: none;
@@ -172,14 +169,11 @@
 
         .btn:hover {
             transform: translateY(-2px);
-            /* buttons pop up when hovered */
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
-            /* shadow gets darker */
         }
 
         .btn:active {
             transform: translateY(1px);
-            /* actually looks like it clicks down */
         }
 
         .btn-buy {
@@ -274,7 +268,7 @@
             <header class="top-header">
                 <div class="greeting">
                     <h1 style="font-size: 22px;">Terminal Overview</h1>
-                    <p style="color: #848e9c; font-size: 14px; margin-top: 5px;">Status: Online & Connected</p>
+                    <p style="color: var(--accent-green); font-size: 14px; margin-top: 5px;">● Live Market Feed</p>
                 </div>
                 <div class="wallet-widget">
                     <span>Available USD</span>
@@ -327,7 +321,7 @@
             const entry = { type: type, amount: amount, coin: coinId, price: price, time: timeStr };
 
             tradeHistory.unshift(entry);
-            if (tradeHistory.length > 30) tradeHistory.pop(); // keep it clean
+            if (tradeHistory.length > 30) tradeHistory.pop();
 
             saveData();
             renderHistory();
@@ -335,7 +329,7 @@
 
         function buyCoin(coinId) {
             let targetCoin = coins.find(c => c.id === coinId);
-            let spendAmount = prompt(`How much USD do you want to spend on ${targetCoin.name}?`);
+            let spendAmount = prompt(`How much USD do you want to spend on ${targetCoin.name} at $${targetCoin.price.toFixed(2)}?`);
             spendAmount = parseFloat(spendAmount);
 
             if (isNaN(spendAmount) || spendAmount <= 0) return alert("Error: Invalid Amount.");
@@ -354,7 +348,7 @@
         function sellCoin(coinId) {
             let targetCoin = coins.find(c => c.id === coinId);
             let currentBag = myPortfolio[coinId].toFixed(4);
-            let sellAmount = prompt(`Selling ${targetCoin.id}. You own ${currentBag}.\nHow much crypto do you want to sell?`);
+            let sellAmount = prompt(`Selling ${targetCoin.id} at $${targetCoin.price.toFixed(2)}.\nYou own ${currentBag}. How much to sell?`);
             sellAmount = parseFloat(sellAmount);
 
             if (isNaN(sellAmount) || sellAmount <= 0) return alert("Error: Invalid Amount.");
@@ -387,7 +381,7 @@
                             <span style="color: #fcd535; font-size: 20px; margin-right: 10px;">${coin.icon}</span> 
                             <strong style="font-size: 18px;">${coin.id}</strong> <span style="color: var(--text-muted); font-size: 13px; margin-left: 5px;">${coin.name}</span>
                         </div>
-                        <div class="coin-price mono-num">$${coin.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+                        <div class="coin-price mono-num" id="price-${coin.id}">$${coin.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 })}</div>
                         <div class="coin-actions">
                             <button class="btn btn-buy" onclick="buyCoin('${coin.id}')">BUY</button>
                             <button class="btn btn-sell" onclick="sellCoin('${coin.id}')">SELL</button>
@@ -438,14 +432,34 @@
                     </div>
                 `;
             });
-        }     
-        
+        }
+
+        // --- THE MARKET VOLATILITY ENGINE (HOUR 9) ---
+        // making the prices dance so it looks like I'm a real wall street guy
+        function updatePrices() {
+            for (let i = 0; i < coins.length; i++) {
+                // Random swing between -2% and +2%
+                let swing = 1 + (Math.random() * 0.04 - 0.02);
+                coins[i].price = coins[i].price * swing;
+
+                // Only updating the specific price elements instead of re-rendering everything
+                // so the buttons don't flicker if you try to click them
+                let priceElement = document.getElementById(`price-${coins[i].id}`);
+                if (priceElement) {
+                    priceElement.innerText = "$" + coins[i].price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+                }
+            }
+        }
+
+        // Run the engine every 3 seconds
+        setInterval(updatePrices, 3000);
+
         // Initialize UI
         updateTopUI();
-        renderMarket(); 
+        renderMarket();
         renderPortfolio();
-        renderHistory();
+        renderHistory();     
     </script>
-</body>    
-    
-</html>           
+</body>
+                                                       
+</html>
