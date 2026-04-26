@@ -1,20 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
+<head>     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vibecoding Trader Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        /* CSS Variables and Base Styling */
-        :root {
-            --bg-color: #f4f7f6;
-            --sidebar-bg: #1e2b3c;
-            --text-main: #333;
-            --accent-green: #2ecc71;
-            --accent-red: #e74c3c;
-            --card-bg: #ffffff;
+    <title>VibeTrade Terminal Pro</title>  
+    <link            
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
+        rel="stylesheet">
+
+    <style>                                       
+        /* PRO TRADER DARK MODE VARIABLES */
+        :root {          
+            --bg-color: #0b0e11;
+            /* Binance dark vibe */
+            --panel-bg: #181a20;
+            --text-main: #eaecef;  
+            --text-muted: #848e9c;                         
+            --accent-green: #0ecb81;                    
+            /* Neon green */     
+            --accent-red: #f6465d;
+            /* Neon red */
+            --border-color: #2b3139;
         }
 
         * {
@@ -24,12 +31,16 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
         }
 
-        /* Layout Grid */
+        /* Number font class to make money look legit */
+        .mono-num {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
         .app-container {
             display: flex;
             min-height: 100vh;
@@ -37,15 +48,17 @@
 
         .sidebar {
             width: 250px;
-            background-color: var(--sidebar-bg);
-            color: white;
+            background-color: var(--panel-bg);
+            border-right: 1px solid var(--border-color);
             padding: 20px;
         }
 
         .logo h2 {
             margin-bottom: 40px;
             font-size: 24px;
-            color: var(--accent-green);
+            color: #fcd535;
+            /* crypto gold */
+            letter-spacing: 1px;
         }
 
         .nav-links {
@@ -53,16 +66,18 @@
         }
 
         .nav-links li {
-            padding: 15px 10px;
-            margin-bottom: 10px;
-            border-radius: 8px;
+            padding: 12px 10px;
+            margin-bottom: 5px;
+            border-radius: 4px;
             cursor: pointer;
-            transition: background 0.3s ease;
+            color: var(--text-muted);
+            transition: all 0.2s;
         }
 
         .nav-links li:hover,
         .nav-links li.active {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: #2b3139;
+            color: var(--text-main);
         }
 
         .main-content {
@@ -70,25 +85,31 @@
             padding: 30px;
         }
 
-        /* Header and Panels */
         .top-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 40px;
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .wallet-widget {
             text-align: right;
         }
 
+        .wallet-widget span {
+            color: var(--text-muted);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Make the balance huge */
         .wallet-widget h2 {
-            color: var(--accent-green);
-            font-size: 28px;
+            color: var(--text-main);
+            font-size: 32px;
+            margin-top: 5px;
         }
 
         .dashboard-grid {
@@ -97,48 +118,64 @@
             gap: 20px;
         }
 
-        .market-panel,
-        .portfolio-panel {
-            background: var(--card-bg);
+        .panel {
+            background: var(--panel-bg);
             padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
         }
 
-        /* Coin UI Elements */
+        .panel h3 {
+            color: var(--text-muted);
+            font-size: 16px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
         .coin-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .coin-row:last-child {
             border-bottom: none;
         }
 
+        .coin-price {
+            font-size: 18px;
+        }
+
         .btn {
-            padding: 8px 15px;
+            padding: 8px 16px;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
         }
 
         .btn-buy {
             background: var(--accent-green);
-            color: white;
+            color: #000;
         }
 
+        /* black text on neon green looks pro */
         .btn-sell {
             background: var(--accent-red);
-            color: white;
+            color: #fff;
         }
 
         .portfolio-item {
-            padding: 10px 0;
-            border-bottom: 1px dashed #ccc;
+            padding: 12px 0;
+            border-bottom: 1px dashed var(--border-color);
             display: flex;
             justify-content: space-between;
         }
@@ -150,40 +187,42 @@
 
         <aside class="sidebar">
             <div class="logo">
-                <h2>🚀 VibeTrade</h2>
+                <h2>⚡ VibeTrade</h2>
             </div>
             <ul class="nav-links">
-                <li class="active">📊 Dashboard</li>
-                <li>💼 My Portfolio</li>
+                <li class="active">📊 Market Data</li>
+                <li>💼 Spot Wallet</li>
+                <li>⚙️ Settings</li>
             </ul>
         </aside>
 
         <main class="main-content">
             <header class="top-header">
                 <div class="greeting">
-                    <h1>Welcome back, Trader</h1>
+                    <h1 style="font-size: 20px;">Terminal Overview</h1>
+                    <p style="color: #848e9c; font-size: 14px; margin-top: 5px;">Status: Online & Connected</p>
                 </div>
                 <div class="wallet-widget">
-                    <span>Buying Power:</span>
-                    <h2 id="usd-balance">$0.00</h2>
+                    <span>Available USD</span>
+                    <h2 id="usd-balance" class="mono-num">$0.00</h2>
                 </div>
             </header>
 
             <section class="dashboard-grid">
-                <div class="market-panel">
-                    <h3>Live Market</h3>
+                <div class="panel">
+                    <h3>Live Markets</h3>
                     <div id="coin-list" class="coin-list"></div>
                 </div>
-                <div class="portfolio-panel">
-                    <h3>My Bags 🎒</h3>
-                    <div id="my-crypto-list"></div>
+
+                <div class="panel">
+                    <h3>Spot Portfolio 🎒</h3>
+                    <div id="my-crypto-list" class="mono-num"></div>
                 </div>
             </section>
         </main>
     </div>
 
     <script>
-        // 1. Data Structure
         const coins = [
             { id: 'BTC', name: 'Bitcoin', price: 62000.50, icon: '₿' },
             { id: 'ETH', name: 'Ethereum', price: 3400.25, icon: '♦' },
@@ -191,48 +230,65 @@
             { id: 'DOGE', name: 'Dogecoin', price: 0.15, icon: '🐕' }
         ];
 
-        // 2. State Management (LocalStorage)
-        let userBalance = parseFloat(localStorage.getItem('vibeBalance')) || 10000.00;
+        var userBalance = parseFloat(localStorage.getItem('vibeBalance')) || 10000.00; // using var because why not
         let myPortfolio = JSON.parse(localStorage.getItem('vibePortfolio')) || { BTC: 0, ETH: 0, SOL: 0, DOGE: 0 };
 
         function updateTopUI() {
             document.getElementById('usd-balance').innerText = "$" + userBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-        // 3. The Buy Logic
+        // --- BUY LOGIC ---
         function buyCoin(coinId) {
             let targetCoin = coins.find(c => c.id === coinId);
             let spendAmount = prompt(`How much USD do you want to spend on ${targetCoin.name}?`);
-
             spendAmount = parseFloat(spendAmount);
 
-            // Validation checks so it doesn't crash
-            if (isNaN(spendAmount) || spendAmount <= 0) {
-                alert("Please enter a valid amount.");
-                return;
-            }
-            if (spendAmount > userBalance) {
-                alert("You don't have enough USD for this trade.");
-                return;
-            }
+            // checking for idiots
+            if (isNaN(spendAmount) || spendAmount <= 0) return alert("Error: Invalid Amount.");
+            if (spendAmount > userBalance) return alert("Error: Insufficient USD Balance.");
 
-            // Math: Calculate how much crypto they get
             let cryptoReceived = spendAmount / targetCoin.price;
-
-            // Update variables
             userBalance -= spendAmount;
             myPortfolio[coinId] += cryptoReceived;
 
-            // Save to localStorage
-            localStorage.setItem('vibeBalance', userBalance);
-            localStorage.setItem('vibePortfolio', JSON.stringify(myPortfolio));
-
-            // Refresh screen
+            saveData();
             updateTopUI();
             renderPortfolio();
         }
 
-        // 4. Render Market 
+        // --- NEW SELL LOGIC (Hour 6) ---
+        // basically copied the buy logic but reversed the math
+        function sellCoin(coinId) {
+            let targetCoin = coins.find(c => c.id === coinId);
+
+            // show them how much they actually own in the prompt so they don't guess
+            let currentBag = myPortfolio[coinId].toFixed(4);
+            let sellAmount = prompt(`Selling ${targetCoin.id}. You own ${currentBag}.\nHow much crypto do you want to sell?`);
+
+            sellAmount = parseFloat(sellAmount);
+
+            // error checks
+            if (isNaN(sellAmount) || sellAmount <= 0) return alert("Error: Invalid Amount.");
+            if (sellAmount > myPortfolio[coinId]) return alert("Error: Insufficient Crypto Balance.");
+
+            // calculate USD gained
+            let usdGained = sellAmount * targetCoin.price;
+
+            // update bags (plus USD, minus crypto)
+            userBalance += usdGained;
+            myPortfolio[coinId] -= sellAmount;
+
+            saveData();
+            updateTopUI();
+            renderPortfolio();
+        }
+
+        function saveData() {
+            localStorage.setItem('vibeBalance', userBalance);
+            localStorage.setItem('vibePortfolio', JSON.stringify(myPortfolio));
+            console.log("Bags saved to local storage!"); // forgot to remove this lol
+        }
+
         function renderMarket() {
             const marketContainer = document.getElementById('coin-list');
             marketContainer.innerHTML = "";
@@ -240,30 +296,45 @@
                 let coin = coins[i];
                 marketContainer.innerHTML += `
                     <div class="coin-row">
-                        <div class="coin-info"><span style="font-size: 20px;">${coin.icon}</span> <strong>${coin.name}</strong></div>
-                        <div class="coin-price">$${coin.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+                        <div class="coin-info">
+                            <span style="color: #fcd535; font-size: 18px; margin-right: 10px;">${coin.icon}</span> 
+                            <strong>${coin.id}</strong> <span style="color: var(--text-muted); font-size: 12px; margin-left: 5px;">${coin.name}</span>
+                        </div>
+                        <div class="coin-price mono-num">$${coin.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
                         <div class="coin-actions">
-                            <button class="btn btn-buy" onclick="buyCoin('${coin.id}')">Buy</button>
-                            <button class="btn btn-sell" onclick="alert('Sell logic not written yet')">Sell</button>
+                            <button class="btn btn-buy" onclick="buyCoin('${coin.id}')">BUY</button>
+                            <button class="btn btn-sell" onclick="sellCoin('${coin.id}')">SELL</button>
                         </div>
                     </div>`;
             }
         }
 
-        // 5. Render Portfolio
         function renderPortfolio() {
             const portContainer = document.getElementById('my-crypto-list');
             portContainer.innerHTML = "";
+            let hasCoins = false;
+
+            // TODO: Add a button to clear all assets if I go broke
+
             for (const [coinId, amount] of Object.entries(myPortfolio)) {
-                portContainer.innerHTML += `
-                    <div class="portfolio-item">
-                        <span>${coinId}</span>
-                        <strong>${amount.toFixed(4)}</strong>
-                    </div>`;
+                // only show coins if we actually own some
+                if (amount > 0.00001) {
+                    hasCoins = true;
+                    portContainer.innerHTML += `
+                        <div class="portfolio-item">
+                            <span style="color: var(--text-muted);">${coinId}</span>
+                            <strong>${amount.toFixed(4)}</strong>
+                        </div>`;
+                }
+            }
+
+            // show a placeholder if portfolio is empty
+            if (!hasCoins) {
+                portContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 14px; text-align: center; margin-top: 20px;">No assets held.</p>`;
             }
         }
 
-        // Initialize the app on load
+        // Run on load
         updateTopUI();
         renderMarket();
         renderPortfolio();
@@ -271,5 +342,3 @@
 </body>
 
 </html>
-
-            
