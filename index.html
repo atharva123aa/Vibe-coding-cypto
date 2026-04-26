@@ -1,26 +1,23 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="en">
 
-<head>     
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VibeTrade Terminal Pro</title>  
-    <link            
-        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
-        rel="stylesheet">
+    <title>VibeTrade Terminal Pro</title>
 
-    <style>                                       
-        /* PRO TRADER DARK MODE VARIABLES */
-        :root {          
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Roboto+Mono:wght@500;700&display=swap"
+        rel="stylesheet"<>
+
+    <style>
+        :root {
             --bg-color: #0b0e11;
-            /* Binance dark vibe */
             --panel-bg: #181a20;
-            --text-main: #eaecef;  
-            --text-muted: #848e9c;                         
-            --accent-green: #0ecb81;                    
-            /* Neon green */     
+            --text-main: #eaecef;
+            --text-muted: #848e9c;
+            --accent-green: #0ecb81;
             --accent-red: #f6465d;
-            /* Neon red */
             --border-color: #2b3139;
         }
 
@@ -31,14 +28,13 @@
         }
 
         body {
-            font-family: 'Space Grotesk', sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
         }
 
-        /* Number font class to make money look legit */
         .mono-num {
-            font-family: 'JetBrains Mono', monospace;
+            font-family: 'Roboto Mono', monospace;
         }
 
         .app-container {
@@ -57,7 +53,6 @@
             margin-bottom: 40px;
             font-size: 24px;
             color: #fcd535;
-            /* crypto gold */
             letter-spacing: 1px;
         }
 
@@ -74,7 +69,6 @@
             transition: all 0.2s;
         }
 
-        .nav-links li:hover,
         .nav-links li.active {
             background-color: #2b3139;
             color: var(--text-main);
@@ -100,14 +94,12 @@
 
         .wallet-widget span {
             color: var(--text-muted);
-            font-size: 14px;
+            font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
-        /* Make the balance huge */
         .wallet-widget h2 {
-            color: var(--text-main);
+            color: var(--accent-green);
             font-size: 32px;
             margin-top: 5px;
         }
@@ -123,61 +115,82 @@
             padding: 20px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
+            margin-bottom: 20px;
         }
 
         .panel h3 {
             color: var(--text-muted);
-            font-size: 16px;
+            font-size: 14px;
             margin-bottom: 20px;
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .coin-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 0;
+            padding: 12px 0;
             border-bottom: 1px solid var(--border-color);
         }
 
-        .coin-row:last-child {
-            border-bottom: none;
-        }
-
-        .coin-price {
-            font-size: 18px;
-        }
-
         .btn {
-            padding: 8px 16px;
+            padding: 6px 12px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-weight: 600;
-            font-family: 'Inter', sans-serif;
-            transition: opacity 0.2s;
-        }
-
-        .btn:hover {
-            opacity: 0.8;
+            font-size: 12px;
         }
 
         .btn-buy {
             background: var(--accent-green);
             color: #000;
+            margin-right: 5px;
         }
 
-        /* black text on neon green looks pro */
         .btn-sell {
             background: var(--accent-red);
             color: #fff;
         }
 
         .portfolio-item {
-            padding: 12px 0;
+            padding: 10px 0;
             border-bottom: 1px dashed var(--border-color);
             display: flex;
             justify-content: space-between;
+        }
+
+        /* HISTORY STYLING - spent way too much time on this part */
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 13px;
+        }
+
+        /* custom scrollbar because the default one is ugly */
+        .history-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .history-list::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 10px;
+        }
+
+        .log-entry {
+            padding: 8px 0;
+            border-bottom: 1px solid #222;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .log-buy {
+            color: var(--accent-green);
+        }
+
+        .log-sell {
+            color: var(--accent-red);
         }
     </style>
 </head>
@@ -190,33 +203,41 @@
                 <h2>⚡ VibeTrade</h2>
             </div>
             <ul class="nav-links">
-                <li class="active">📊 Market Data</li>
-                <li>💼 Spot Wallet</li>
+                <li class="active">📊 Terminal</li>
+                <li>💼 Portfolio</li>
                 <li>⚙️ Settings</li>
             </ul>
         </aside>
 
         <main class="main-content">
             <header class="top-header">
-                <div class="greeting">
-                    <h1 style="font-size: 20px;">Terminal Overview</h1>
-                    <p style="color: #848e9c; font-size: 14px; margin-top: 5px;">Status: Online & Connected</p>
+                <div>
+                    <h1 style="font-size: 20px;">Trading Dashboard</h1>
+                    <p style="color: var(--text-muted); font-size: 13px;">Market Session: Active</p>
                 </div>
                 <div class="wallet-widget">
-                    <span>Available USD</span>
+                    <span>Available Balance</span>
                     <h2 id="usd-balance" class="mono-num">$0.00</h2>
                 </div>
             </header>
 
             <section class="dashboard-grid">
                 <div class="panel">
-                    <h3>Live Markets</h3>
-                    <div id="coin-list" class="coin-list"></div>
+                    <h3>Market Pairs</h3>
+                    <div id="coin-list"></div>
                 </div>
 
-                <div class="panel">
-                    <h3>Spot Portfolio 🎒</h3>
-                    <div id="my-crypto-list" class="mono-num"></div>
+                <div id="right-col">
+                    <div class="panel">
+                        <h3>Your Assets 🎒</h3>
+                        <div id="my-crypto-list" class="mono-num"></div>
+                    </div>
+
+                    <div class="panel">
+                        <h3>Recent Activity 📜</h3>
+                        <div id="history-display" class="history-list">
+                        </div>
+                    </div>
                 </div>
             </section>
         </main>
@@ -230,54 +251,83 @@
             { id: 'DOGE', name: 'Dogecoin', price: 0.15, icon: '🐕' }
         ];
 
-        var userBalance = parseFloat(localStorage.getItem('vibeBalance')) || 10000.00; // using var because why not
+        let userBalance = parseFloat(localStorage.getItem('vibeBalance')) || 10000.00;
         let myPortfolio = JSON.parse(localStorage.getItem('vibePortfolio')) || { BTC: 0, ETH: 0, SOL: 0, DOGE: 0 };
 
+        // Load history from storage or start fresh
+        let tradeHistory = JSON.parse(localStorage.getItem('vibeHistory')) || [];
+
         function updateTopUI() {
-            document.getElementById('usd-balance').innerText = "$" + userBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('usd-balance').innerText = "$" + userBalance.toLocaleString('en-US', { minimumFractionDigits: 2 });
         }
 
-        // --- BUY LOGIC ---
+        // --- THE NEW LOGGING LOGIC ---
+        function addToHistory(type, amount, coin, price) {
+            const now = new Date();
+            const timeStr = now.getHours() + ":" + now.getMinutes().toString().padStart(2, '0');
+
+            const entry = {
+                type: type, // "BUY" or "SELL"
+                amount: amount,
+                coin: coin,
+                price: price,
+                time: timeStr
+            };
+
+            // add to the beginning of the array so newest is first
+            tradeHistory.unshift(entry);
+
+            // keep only the last 20 trades so we don't blow up localStorage
+            if (tradeHistory.length > 20) tradeHistory.pop();
+
+            saveData();
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const histContainer = document.getElementById('history-display');
+            histContainer.innerHTML = "";
+
+            tradeHistory.forEach(item => {
+                const colorClass = item.type === 'BUY' ? 'log-buy' : 'log-sell';
+                histContainer.innerHTML += `
+                    <div class="log-entry">
+                        <span class="${colorClass}"><strong>${item.type}</strong> ${item.coin}</span>
+                        <span class="mono-num" style="color:var(--text-muted)">${item.time}</span>
+                    </div>
+                `;
+            });
+        }
+
         function buyCoin(coinId) {
             let targetCoin = coins.find(c => c.id === coinId);
-            let spendAmount = prompt(`How much USD do you want to spend on ${targetCoin.name}?`);
+            let spendAmount = prompt(`Buy ${targetCoin.id}: How much USD?`);
             spendAmount = parseFloat(spendAmount);
 
-            // checking for idiots
-            if (isNaN(spendAmount) || spendAmount <= 0) return alert("Error: Invalid Amount.");
-            if (spendAmount > userBalance) return alert("Error: Insufficient USD Balance.");
+            if (isNaN(spendAmount) || spendAmount <= 0 || spendAmount > userBalance) return alert("Invalid trade.");
 
             let cryptoReceived = spendAmount / targetCoin.price;
             userBalance -= spendAmount;
             myPortfolio[coinId] += cryptoReceived;
 
+            addToHistory("BUY", cryptoReceived, coinId, targetCoin.price);
             saveData();
             updateTopUI();
             renderPortfolio();
         }
 
-        // --- NEW SELL LOGIC (Hour 6) ---
-        // basically copied the buy logic but reversed the math
         function sellCoin(coinId) {
             let targetCoin = coins.find(c => c.id === coinId);
-
-            // show them how much they actually own in the prompt so they don't guess
-            let currentBag = myPortfolio[coinId].toFixed(4);
-            let sellAmount = prompt(`Selling ${targetCoin.id}. You own ${currentBag}.\nHow much crypto do you want to sell?`);
-
+            let sellAmount = prompt(`Sell ${targetCoin.id}: How much crypto?`);
             sellAmount = parseFloat(sellAmount);
 
-            // error checks
-            if (isNaN(sellAmount) || sellAmount <= 0) return alert("Error: Invalid Amount.");
-            if (sellAmount > myPortfolio[coinId]) return alert("Error: Insufficient Crypto Balance.");
+            if (isNaN(sellAmount) || sellAmount <= 0 || sellAmount > myPortfolio[coinId]) return alert("Invalid trade.");
 
-            // calculate USD gained
             let usdGained = sellAmount * targetCoin.price;
-
-            // update bags (plus USD, minus crypto)
             userBalance += usdGained;
             myPortfolio[coinId] -= sellAmount;
 
+            addToHistory("SELL", sellAmount, coinId, targetCoin.price);
             saveData();
             updateTopUI();
             renderPortfolio();
@@ -286,59 +336,45 @@
         function saveData() {
             localStorage.setItem('vibeBalance', userBalance);
             localStorage.setItem('vibePortfolio', JSON.stringify(myPortfolio));
-            console.log("Bags saved to local storage!"); // forgot to remove this lol
+            localStorage.setItem('vibeHistory', JSON.stringify(tradeHistory));
         }
 
         function renderMarket() {
             const marketContainer = document.getElementById('coin-list');
             marketContainer.innerHTML = "";
-            for (let i = 0; i < coins.length; i++) {
-                let coin = coins[i];
+            coins.forEach(coin => {
                 marketContainer.innerHTML += `
                     <div class="coin-row">
-                        <div class="coin-info">
-                            <span style="color: #fcd535; font-size: 18px; margin-right: 10px;">${coin.icon}</span> 
-                            <strong>${coin.id}</strong> <span style="color: var(--text-muted); font-size: 12px; margin-left: 5px;">${coin.name}</span>
+                        <div>
+                            <span style="color:#fcd535; margin-right:8px">${coin.icon}</span>
+                            <strong>${coin.id}</strong>
                         </div>
-                        <div class="coin-price mono-num">$${coin.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
-                        <div class="coin-actions">
+                        <div class="mono-num">$${coin.price.toLocaleString()}</div>
+                        <div>
                             <button class="btn btn-buy" onclick="buyCoin('${coin.id}')">BUY</button>
                             <button class="btn btn-sell" onclick="sellCoin('${coin.id}')">SELL</button>
                         </div>
                     </div>`;
-            }
+            });
         }
 
         function renderPortfolio() {
             const portContainer = document.getElementById('my-crypto-list');
             portContainer.innerHTML = "";
-            let hasCoins = false;
-
-            // TODO: Add a button to clear all assets if I go broke
-
-            for (const [coinId, amount] of Object.entries(myPortfolio)) {
-                // only show coins if we actually own some
-                if (amount > 0.00001) {
-                    hasCoins = true;
-                    portContainer.innerHTML += `
-                        <div class="portfolio-item">
-                            <span style="color: var(--text-muted);">${coinId}</span>
-                            <strong>${amount.toFixed(4)}</strong>
-                        </div>`;
+            let empty = true;
+            for (const [id, amt] of Object.entries(myPortfolio)) {
+                if (amt > 0.000001) {
+                    empty = false;
+                    portContainer.innerHTML += `<div class="portfolio-item"><span>${id}</span> <strong>${amt.toFixed(4)}</strong></div>`;
                 }
             }
-
-            // show a placeholder if portfolio is empty
-            if (!hasCoins) {
-                portContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 14px; text-align: center; margin-top: 20px;">No assets held.</p>`;
-            }
+            if (empty) portContainer.innerHTML = "<p style='color:var(--text-muted); font-size:12px'>Empty Wallet</p>";
         }
 
-        // Run on load
+        // Initialize everything
         updateTopUI();
         renderMarket();
         renderPortfolio();
+        renderHistory();
     </script>
-</body>
-
-</html>
+</body </html>
