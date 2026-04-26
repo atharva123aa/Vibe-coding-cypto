@@ -156,6 +156,17 @@
             transition: color 0.3s ease;
         }
 
+        /* HOUR 11 CSS: Color flashes for the market engine */
+        .price-up {
+            color: var(--accent-green) !important;
+            text-shadow: 0 0 8px rgba(14, 203, 129, 0.3);
+        }
+
+        .price-down {
+            color: var(--accent-red) !important;
+            text-shadow: 0 0 8px rgba(246, 70, 93, 0.3);
+        }
+
         .btn {
             padding: 8px 18px;
             border: none;
@@ -252,7 +263,6 @@
 
 <body>
     <div class="app-container">
-
         <aside class="sidebar">
             <div class="logo">
                 <h2>⚡ VibeTrade</h2>
@@ -263,7 +273,6 @@
                 <li>⚙️ Settings</li>
             </ul>
         </aside>
-
         <main class="main-content">
             <header class="top-header">
                 <div class="greeting">
@@ -275,19 +284,16 @@
                     <h2 id="usd-balance" class="mono-num">$0.00</h2>
                 </div>
             </header>
-
             <section class="dashboard-grid">
                 <div class="panel">
                     <h3>Live Markets</h3>
-                    <div id="coin-list" class="coin-list"></div>
+                    <div id="coin-list"></div>
                 </div>
-
                 <div class="right-col">
                     <div class="panel">
                         <h3>Spot Portfolio 🎒</h3>
                         <div id="my-crypto-list" class="mono-num"></div>
                     </div>
-
                     <div class="panel">
                         <h3>Recent Activity 📜</h3>
                         <div id="history-display" class="history-list"></div>
@@ -298,7 +304,6 @@
     </div>
 
     <script>
-        // Data structure
         const coins = [
             { id: 'BTC', name: 'Bitcoin', price: 62000.50, icon: '₿' },
             { id: 'ETH', name: 'Ethereum', price: 3400.25, icon: '♦' },
@@ -317,12 +322,9 @@
         function addToHistory(type, amount, coinId, price) {
             const now = new Date();
             const timeStr = now.getHours() + ":" + now.getMinutes().toString().padStart(2, '0');
-
             const entry = { type: type, amount: amount, coin: coinId, price: price, time: timeStr };
-
             tradeHistory.unshift(entry);
             if (tradeHistory.length > 30) tradeHistory.pop();
-
             saveData();
             renderHistory();
         }
@@ -331,9 +333,7 @@
             let targetCoin = coins.find(c => c.id === coinId);
             let spendAmount = prompt(`How much USD do you want to spend on ${targetCoin.name} at $${targetCoin.price.toFixed(2)}?`);
             spendAmount = parseFloat(spendAmount);
-
-            if (isNaN(spendAmount) || spendAmount <= 0) return alert("Error: Invalid Amount.");
-            if (spendAmount > userBalance) return alert("Error: Insufficient USD Balance.");
+            if (isNaN(spendAmount) || spendAmount <= 0 || spendAmount > userBalance) return alert("Invalid Trade.");
 
             let cryptoReceived = spendAmount / targetCoin.price;
             userBalance -= spendAmount;
@@ -350,9 +350,7 @@
             let currentBag = myPortfolio[coinId].toFixed(4);
             let sellAmount = prompt(`Selling ${targetCoin.id} at $${targetCoin.price.toFixed(2)}.\nYou own ${currentBag}. How much to sell?`);
             sellAmount = parseFloat(sellAmount);
-
-            if (isNaN(sellAmount) || sellAmount <= 0) return alert("Error: Invalid Amount.");
-            if (sellAmount > myPortfolio[coinId]) return alert("Error: Insufficient Crypto Balance.");
+            if (isNaN(sellAmount) || sellAmount <= 0 || sellAmount > myPortfolio[coinId]) return alert("Invalid Trade.");
 
             let usdGained = sellAmount * targetCoin.price;
             userBalance += usdGained;
@@ -394,72 +392,63 @@
             const portContainer = document.getElementById('my-crypto-list');
             portContainer.innerHTML = "";
             let hasCoins = false;
-
             for (const [coinId, amount] of Object.entries(myPortfolio)) {
                 if (amount > 0.00001) {
                     hasCoins = true;
-                    portContainer.innerHTML += `
-                        <div class="portfolio-item">
-                            <span style="color: var(--text-muted); font-weight: bold;">${coinId}</span>
-                            <strong>${amount.toFixed(4)}</strong>
-                        </div>`;
+                    portContainer.innerHTML += `<div class="portfolio-item"><span style="color: var(--text-muted); font-weight: bold;">${coinId}</span><strong>${amount.toFixed(4)}</strong></div>`;
                 }
             }
-
-            if (!hasCoins) {
-                portContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 14px; text-align: center; margin-top: 20px;">No assets held.</p>`;
-            }
+            if (!hasCoins) portContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 14px; text-align: center; margin-top: 20px;">No assets held.</p>`;
         }
 
         function renderHistory() {
             const histContainer = document.getElementById('history-display');
             histContainer.innerHTML = "";
-
             if (tradeHistory.length === 0) {
                 histContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 14px; text-align: center; margin-top: 20px;">No recent trades.</p>`;
                 return;
             }
-
             tradeHistory.forEach(item => {
                 const colorClass = item.type === 'BUY' ? 'log-buy' : 'log-sell';
                 histContainer.innerHTML += `
                     <div class="log-entry">
-                        <div>
-                            <span class="${colorClass}">${item.type}</span> 
-                            <span class="mono-num" style="margin-left: 8px;">${item.amount.toFixed(4)} ${item.coin}</span>
-                        </div>
+                        <div><span class="${colorClass}">${item.type}</span> <span class="mono-num" style="margin-left: 8px;">${item.amount.toFixed(4)} ${item.coin}</span></div>
                         <div class="log-time mono-num">${item.time}</div>
                     </div>
                 `;
             });
         }
 
-        // --- THE MARKET VOLATILITY ENGINE (HOUR 9) ---
-        // making the prices dance so it looks like I'm a real wall street guy
+        // HOUR 10 FIX & HOUR 11 LOGIC: Combined crash fix with color checking
         function updatePrices() {
             for (let i = 0; i < coins.length; i++) {
-                // Random swing between -2% and +2%
+                let oldPrice = coins[i].price;
                 let swing = 1 + (Math.random() * 0.04 - 0.02);
-                coins[i].price = coins[i].price * swing;
+                coins[i].price = oldPrice * swing;
 
-                // Only updating the specific price elements instead of re-rendering everything
-                // so the buttons don't flicker if you try to click them
                 let priceElement = document.getElementById(`price-${coins[i].id}`);
                 if (priceElement) {
                     priceElement.innerText = "$" + coins[i].price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+
+                    // Add color flashing
+                    priceElement.classList.remove('price-up', 'price-down');
+                    if (coins[i].price > oldPrice) {
+                        priceElement.classList.add('price-up');
+                    } else {
+                        priceElement.classList.add('price-down');
+                    }
                 }
             }
         }
 
-        // Run the engine every 3 seconds
-        setInterval(updatePrices, 3000);
+        // Safe interval to stop the fan from screaming
+        setInterval(updatePrices, 5000);
 
-        // Initialize UI
         updateTopUI();
         renderMarket();
-        renderPortfolio();
-        renderHistory();     
+        renderPortfolio();      
+        renderHistory();
     </script>
 </body>
-                                                       
-</html>
+
+</html>                                                                                                  
