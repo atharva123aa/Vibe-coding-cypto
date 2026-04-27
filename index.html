@@ -10,7 +10,7 @@
         rel="stylesheet">
 
     <style>
-        :root {
+        :root { 
             --bg-color: #0b0e11;
             --panel-bg: #181a20;
             --text-main: #eaecef;
@@ -137,7 +137,6 @@
             text-transform: uppercase;
         }
 
-        /* HOUR 12 CSS: The Net Worth Badge */
         .net-worth-badge {
             float: right;
             color: #fcd535;
@@ -176,6 +175,35 @@
             text-shadow: 0 0 8px rgba(246, 70, 93, 0.3);
         }
 
+        /* HOUR 13: CSS Badges for Coin Categories */
+        .badge {
+            font-size: 10px;
+            padding: 3px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+            font-weight: bold;
+            text-transform: uppercase;
+            vertical-align: middle;
+        }
+
+        .badge-l1 {
+            background: rgba(14, 203, 129, 0.1);
+            color: var(--accent-green);
+            border: 1px solid var(--accent-green);
+        }
+
+        .badge-meme {
+            background: rgba(246, 70, 93, 0.1);
+            color: var(--accent-red);
+            border: 1px solid var(--accent-red);
+        }
+
+        .badge-alt {
+            background: rgba(252, 213, 53, 0.1);
+            color: #fcd535;
+            border: 1px solid #fcd535;
+        }
+
         .btn {
             padding: 8px 18px;
             border: none;
@@ -212,6 +240,7 @@
             border-bottom: 1px dashed var(--border-color);
             display: flex;
             justify-content: space-between;
+            align-items: center;
         }
 
         .portfolio-item:last-child {
@@ -267,15 +296,16 @@
             padding: 4px 8px;
             border-radius: 4px;
         }
-    </style>
-</head>
+    </style> 
 
-<body>
+</head>                                              
+                             
+<body>             
     <div class="app-container">
-        <aside class="sidebar">
+    <aside class="sidebar">
             <div class="logo">
                 <h2>⚡ VibeTrade</h2>
-            </div>
+              iv>
             <ul class="nav-links">
                 <li class="active">📊 Market Data</li>
                 <li>💼 Spot Wallet</li>
@@ -313,23 +343,33 @@
         </main>
     </div>
 
-    <script>
+    <script>  
+        // HOUR 13: Expanded database with types for the badges
         const coins = [
-            { id: 'BTC', name: 'Bitcoin', price: 62000.50, icon: '₿' },
-            { id: 'ETH', name: 'Ethereum', price: 3400.25, icon: '♦' },
-            { id: 'SOL', name: 'Solana', price: 145.80, icon: '☀️' },
-            { id: 'DOGE', name: 'Dogecoin', price: 0.15, icon: '🐕' }
+                   { id: 'BTC', name: 'Bitcoin', price: 62000.50, icon: '₿', type: 'L1' },
+            { id: 'ETH', name: 'Ethereum', price: 3400.25, icon: '♦', type: 'L1' },
+            { id: 'SOL', name: 'Solana', price: 145.80, icon: '☀️', type: 'L1' },
+            { id: 'XRP', name: 'Ripple', price: 0.55, icon: '✕', type: 'ALT' },
+            { id: 'ADA', name: 'Cardano', price: 0.45, icon: '₳', type: 'L1' },
+            { id: 'DOGE', name: 'Dogecoin', price: 0.15, icon: '🐕', type: 'MEME' },
+            { id: 'SHIB', name: 'Shiba Inu', price: 0.000025, icon: '🐶', type: 'MEME' },
+            { id: 'PEPE', name: 'Pepe', price: 0.000008, icon: '🐸', type: 'MEME' },
+            { id: 'FLOKI', name: 'Floki', price: 0.0002, icon: '🛡️', type: 'MEME' }
         ];
 
         let userBalance = parseFloat(localStorage.getItem('vibeBalance')) || 10000.00;
-        let myPortfolio = JSON.parse(localStorage.getItem('vibePortfolio')) || { BTC: 0, ETH: 0, SOL: 0, DOGE: 0 };
+
+        // had to write this goofy fallback because adding new coins broke my old localstorage object
+        let savedPortfolio = JSON.parse(localStorage.getItem('vibePortfolio')) || {};
+        let myPortfolio = {};
+        coins.forEach(c => { myPortfolio[c.id] = savedPortfolio[c.id] || 0; });
+
         let tradeHistory = JSON.parse(localStorage.getItem('vibeHistory')) || [];
 
         function updateTopUI() {
             document.getElementById('usd-balance').innerText = "$" + userBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-        // --- HOUR 12 LOGIC: Net Worth Calculator ---
         function updateNetWorth() {
             let totalCryptoValue = 0;
             for (const [coinId, amount] of Object.entries(myPortfolio)) {
@@ -354,7 +394,7 @@
 
         function buyCoin(coinId) {
             let targetCoin = coins.find(c => c.id === coinId);
-            let spendAmount = prompt(`How much USD do you want to spend on ${targetCoin.name} at $${targetCoin.price.toFixed(2)}?`);
+            let spendAmount = prompt(`How much USD do you want to spend on ${targetCoin.name} at $${targetCoin.price.toFixed(6)}?`);
             spendAmount = parseFloat(spendAmount);
             if (isNaN(spendAmount) || spendAmount <= 0 || spendAmount > userBalance) return alert("Invalid Trade.");
 
@@ -366,13 +406,13 @@
             saveData();
             updateTopUI();
             renderPortfolio();
-            updateNetWorth(); // update after buy
+            updateNetWorth();
         }
 
         function sellCoin(coinId) {
             let targetCoin = coins.find(c => c.id === coinId);
-            let currentBag = myPortfolio[coinId].toFixed(4);
-            let sellAmount = prompt(`Selling ${targetCoin.id} at $${targetCoin.price.toFixed(2)}.\nYou own ${currentBag}. How much to sell?`);
+            let currentBag = myPortfolio[coinId].toLocaleString('en-US', { maximumFractionDigits: 6 });
+            let sellAmount = prompt(`Selling ${targetCoin.id} at $${targetCoin.price.toFixed(6)}.\nYou own ${currentBag}. How much to sell?`);
             sellAmount = parseFloat(sellAmount);
             if (isNaN(sellAmount) || sellAmount <= 0 || sellAmount > myPortfolio[coinId]) return alert("Invalid Trade.");
 
@@ -384,13 +424,20 @@
             saveData();
             updateTopUI();
             renderPortfolio();
-            updateNetWorth(); // update after sell
+            updateNetWorth();
         }
 
         function saveData() {
             localStorage.setItem('vibeBalance', userBalance);
             localStorage.setItem('vibePortfolio', JSON.stringify(myPortfolio));
             localStorage.setItem('vibeHistory', JSON.stringify(tradeHistory));
+        }
+
+        // HOUR 13: Helper to render badges
+        function getBadgeHTML(type) {
+            if (type === 'L1') return `<span class="badge badge-l1">L1</span>`;
+            if (type === 'MEME') return `<span class="badge badge-meme">MEME</span>`;
+            return `<span class="badge badge-alt">ALT</span>`;
         }
 
         function renderMarket() {
@@ -402,9 +449,10 @@
                     <div class="coin-row">
                         <div class="coin-info">
                             <span style="color: #fcd535; font-size: 20px; margin-right: 10px;">${coin.icon}</span> 
-                            <strong style="font-size: 18px;">${coin.id}</strong> <span style="color: var(--text-muted); font-size: 13px; margin-left: 5px;">${coin.name}</span>
+                            <strong style="font-size: 18px;">${coin.id}</strong> 
+                            ${getBadgeHTML(coin.type)}
                         </div>
-                        <div class="coin-price mono-num" id="price-${coin.id}">$${coin.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 })}</div>
+                        <div class="coin-price mono-num" id="price-${coin.id}">$${coin.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}</div>
                         <div class="coin-actions">
                             <button class="btn btn-buy" onclick="buyCoin('${coin.id}')">BUY</button>
                             <button class="btn btn-sell" onclick="sellCoin('${coin.id}')">SELL</button>
@@ -418,9 +466,9 @@
             portContainer.innerHTML = "";
             let hasCoins = false;
             for (const [coinId, amount] of Object.entries(myPortfolio)) {
-                if (amount > 0.00001) {
+                if (amount > 0.000001) { // had to lower this threshold because meme bags are huge numbers
                     hasCoins = true;
-                    portContainer.innerHTML += `<div class="portfolio-item"><span style="color: var(--text-muted); font-weight: bold;">${coinId}</span><strong>${amount.toFixed(4)}</strong></div>`;
+                    portContainer.innerHTML += `<div class="portfolio-item"><span style="color: var(--text-muted); font-weight: bold;">${coinId}</span><strong>${amount.toLocaleString('en-US', { maximumFractionDigits: 6 })}</strong></div>`;
                 }
             }
             if (!hasCoins) portContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 14px; text-align: center; margin-top: 20px;">No assets held.</p>`;
@@ -437,7 +485,7 @@
                 const colorClass = item.type === 'BUY' ? 'log-buy' : 'log-sell';
                 histContainer.innerHTML += `
                     <div class="log-entry">
-                        <div><span class="${colorClass}">${item.type}</span> <span class="mono-num" style="margin-left: 8px;">${item.amount.toFixed(4)} ${item.coin}</span></div>
+                        <div><span class="${colorClass}">${item.type}</span> <span class="mono-num" style="margin-left: 8px;">${item.amount.toLocaleString('en-US', { maximumFractionDigits: 4 })} ${item.coin}</span></div>
                         <div class="log-time mono-num">${item.time}</div>
                     </div>
                 `;
@@ -452,7 +500,7 @@
 
                 let priceElement = document.getElementById(`price-${coins[i].id}`);
                 if (priceElement) {
-                    priceElement.innerText = "$" + coins[i].price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+                    priceElement.innerText = "$" + coins[i].price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 });
 
                     priceElement.classList.remove('price-up', 'price-down');
                     if (coins[i].price > oldPrice) {
@@ -462,19 +510,16 @@
                     }
                 }
             }
-            // Update the live net worth while prices change
             updateNetWorth();
-        }   
-  
-       setInterval(updatePrices, 5000);
+        }
 
-        // Initialize UI
+        setInterval(updatePrices, 5000);
+
         updateTopUI();
         renderMarket();
         renderPortfolio();
-        renderHistory();                           
-        updateNetWorth(); // initial calculation                                      
+        renderHistory();
+        updateNetWorth();
     </script>
-</body>             
-
-</html> 
+</body>               
+</html>                                  
