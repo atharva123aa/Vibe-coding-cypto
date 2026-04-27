@@ -137,6 +137,16 @@
             text-transform: uppercase;
         }
 
+        /* HOUR 12 CSS: The Net Worth Badge */
+        .net-worth-badge {
+            float: right;
+            color: #fcd535;
+            font-size: 18px;
+            background: rgba(252, 213, 53, 0.1);
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
         .coin-row {
             display: flex;
             justify-content: space-between;
@@ -156,7 +166,6 @@
             transition: color 0.3s ease;
         }
 
-        /* HOUR 11 CSS: Color flashes for the market engine */
         .price-up {
             color: var(--accent-green) !important;
             text-shadow: 0 0 8px rgba(14, 203, 129, 0.3);
@@ -291,7 +300,8 @@
                 </div>
                 <div class="right-col">
                     <div class="panel">
-                        <h3>Spot Portfolio 🎒</h3>
+                        <h3>Spot Portfolio 🎒 <span id="net-worth-display" class="net-worth-badge mono-num">$0.00</span>
+                        </h3>
                         <div id="my-crypto-list" class="mono-num"></div>
                     </div>
                     <div class="panel">
@@ -319,6 +329,19 @@
             document.getElementById('usd-balance').innerText = "$" + userBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
+        // --- HOUR 12 LOGIC: Net Worth Calculator ---
+        function updateNetWorth() {
+            let totalCryptoValue = 0;
+            for (const [coinId, amount] of Object.entries(myPortfolio)) {
+                let currentCoin = coins.find(c => c.id === coinId);
+                if (currentCoin && amount > 0) {
+                    totalCryptoValue += (amount * currentCoin.price);
+                }
+            }
+            let netWorth = userBalance + totalCryptoValue;
+            document.getElementById('net-worth-display').innerText = "$" + netWorth.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
         function addToHistory(type, amount, coinId, price) {
             const now = new Date();
             const timeStr = now.getHours() + ":" + now.getMinutes().toString().padStart(2, '0');
@@ -343,6 +366,7 @@
             saveData();
             updateTopUI();
             renderPortfolio();
+            updateNetWorth(); // update after buy
         }
 
         function sellCoin(coinId) {
@@ -360,6 +384,7 @@
             saveData();
             updateTopUI();
             renderPortfolio();
+            updateNetWorth(); // update after sell
         }
 
         function saveData() {
@@ -419,7 +444,6 @@
             });
         }
 
-        // HOUR 10 FIX & HOUR 11 LOGIC: Combined crash fix with color checking
         function updatePrices() {
             for (let i = 0; i < coins.length; i++) {
                 let oldPrice = coins[i].price;
@@ -430,7 +454,6 @@
                 if (priceElement) {
                     priceElement.innerText = "$" + coins[i].price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
 
-                    // Add color flashing
                     priceElement.classList.remove('price-up', 'price-down');
                     if (coins[i].price > oldPrice) {
                         priceElement.classList.add('price-up');
@@ -439,16 +462,19 @@
                     }
                 }
             }
-        }
+            // Update the live net worth while prices change
+            updateNetWorth();
+        }   
+  
+       setInterval(updatePrices, 5000);
 
-        // Safe interval to stop the fan from screaming
-        setInterval(updatePrices, 5000);
-
+        // Initialize UI
         updateTopUI();
         renderMarket();
-        renderPortfolio();      
-        renderHistory();
+        renderPortfolio();
+        renderHistory();                           
+        updateNetWorth(); // initial calculation                                      
     </script>
-</body>
+</body>             
 
-</html>                                                                                                  
+</html> 
