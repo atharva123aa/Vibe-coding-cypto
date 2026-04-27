@@ -4,13 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <title>Crypto Dashboard Test</title> -->
     <title>VibeTrade Terminal Pro</title>
+    <!-- TODO: add a favicon later -->
     <link
         href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
         rel="stylesheet">
 
     <style>
-        :root { 
+        :root {
             --bg-color: #0b0e11;
             --panel-bg: #181a20;
             --text-main: #eaecef;
@@ -30,6 +32,7 @@
             font-family: 'Space Grotesk', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
+            /* margin-top: 10px;  removed because it messes up the sidebar */
         }
 
         .mono-num {
@@ -96,6 +99,7 @@
             color: var(--text-muted);
             font-size: 14px;
             text-transform: uppercase;
+            /* letter-spacing: 2px; */
             letter-spacing: 1px;
         }
 
@@ -146,6 +150,26 @@
             border-radius: 6px;
         }
 
+        /* HOUR 14: Custom Scrollbar for the Market List */
+        .coin-list-container {
+            max-height: 520px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .coin-list-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .coin-list-container::-webkit-scrollbar-thumb {
+            background: #3a414a;
+            border-radius: 10px;
+        }
+
+        .coin-list-container::-webkit-scrollbar-track {
+            background: var(--panel-bg);
+        }
+
         .coin-row {
             display: flex;
             justify-content: space-between;
@@ -175,7 +199,6 @@
             text-shadow: 0 0 8px rgba(246, 70, 93, 0.3);
         }
 
-        /* HOUR 13: CSS Badges for Coin Categories */
         .badge {
             font-size: 10px;
             padding: 3px 6px;
@@ -296,18 +319,18 @@
             padding: 4px 8px;
             border-radius: 4px;
         }
-    </style> 
+    </style>
+</head>
 
-</head>                                              
-                             
-<body>             
+<body>
     <div class="app-container">
-    <aside class="sidebar">
+        <aside class="sidebar">
             <div class="logo">
                 <h2>⚡ VibeTrade</h2>
-              iv>
+            </div>
             <ul class="nav-links">
                 <li class="active">📊 Market Data</li>
+                <!-- <li>💸 Send Crypto</li> -->
                 <li>💼 Spot Wallet</li>
                 <li>⚙️ Settings</li>
             </ul>
@@ -326,7 +349,7 @@
             <section class="dashboard-grid">
                 <div class="panel">
                     <h3>Live Markets</h3>
-                    <div id="coin-list"></div>
+                    <div class="coin-list-container" id="coin-list"></div>
                 </div>
                 <div class="right-col">
                     <div class="panel">
@@ -343,10 +366,10 @@
         </main>
     </div>
 
-    <script>  
-        // HOUR 13: Expanded database with types for the badges
+    <script>
+        // TODO: maybe connect this to coingecko API later? hardcoded for now
         const coins = [
-                   { id: 'BTC', name: 'Bitcoin', price: 62000.50, icon: '₿', type: 'L1' },
+            { id: 'BTC', name: 'Bitcoin', price: 62000.50, icon: '₿', type: 'L1' },
             { id: 'ETH', name: 'Ethereum', price: 3400.25, icon: '♦', type: 'L1' },
             { id: 'SOL', name: 'Solana', price: 145.80, icon: '☀️', type: 'L1' },
             { id: 'XRP', name: 'Ripple', price: 0.55, icon: '✕', type: 'ALT' },
@@ -357,11 +380,13 @@
             { id: 'FLOKI', name: 'Floki', price: 0.0002, icon: '🛡️', type: 'MEME' }
         ];
 
-        let userBalance = parseFloat(localStorage.getItem('vibeBalance')) || 10000.00;
+        // console.log("loading app...");
 
-        // had to write this goofy fallback because adding new coins broke my old localstorage object
+        let userBalance = parseFloat(localStorage.getItem('vibeBalance')) || 10000.00;
         let savedPortfolio = JSON.parse(localStorage.getItem('vibePortfolio')) || {};
+
         let myPortfolio = {};
+        // initialize portfolio obj
         coins.forEach(c => { myPortfolio[c.id] = savedPortfolio[c.id] || 0; });
 
         let tradeHistory = JSON.parse(localStorage.getItem('vibeHistory')) || [];
@@ -379,6 +404,7 @@
                 }
             }
             let netWorth = userBalance + totalCryptoValue;
+            // update the UI element
             document.getElementById('net-worth-display').innerText = "$" + netWorth.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
@@ -386,17 +412,24 @@
             const now = new Date();
             const timeStr = now.getHours() + ":" + now.getMinutes().toString().padStart(2, '0');
             const entry = { type: type, amount: amount, coin: coinId, price: price, time: timeStr };
+
             tradeHistory.unshift(entry);
+            // keep it under 30 so localstorage doesnt get huge
             if (tradeHistory.length > 30) tradeHistory.pop();
+
             saveData();
             renderHistory();
         }
 
         function buyCoin(coinId) {
+            // console.log('user clicked buy for', coinId);
             let targetCoin = coins.find(c => c.id === coinId);
             let spendAmount = prompt(`How much USD do you want to spend on ${targetCoin.name} at $${targetCoin.price.toFixed(6)}?`);
+
             spendAmount = parseFloat(spendAmount);
-            if (isNaN(spendAmount) || spendAmount <= 0 || spendAmount > userBalance) return alert("Invalid Trade.");
+            if (isNaN(spendAmount) || spendAmount <= 0 || spendAmount > userBalance) {
+                return alert("Invalid Trade.");
+            }
 
             let cryptoReceived = spendAmount / targetCoin.price;
             userBalance -= spendAmount;
@@ -413,8 +446,12 @@
             let targetCoin = coins.find(c => c.id === coinId);
             let currentBag = myPortfolio[coinId].toLocaleString('en-US', { maximumFractionDigits: 6 });
             let sellAmount = prompt(`Selling ${targetCoin.id} at $${targetCoin.price.toFixed(6)}.\nYou own ${currentBag}. How much to sell?`);
+
             sellAmount = parseFloat(sellAmount);
-            if (isNaN(sellAmount) || sellAmount <= 0 || sellAmount > myPortfolio[coinId]) return alert("Invalid Trade.");
+            // check if they actually have enough
+            if (isNaN(sellAmount) || sellAmount <= 0 || sellAmount > myPortfolio[coinId]) {
+                return alert("Invalid Trade.");
+            }
 
             let usdGained = sellAmount * targetCoin.price;
             userBalance += usdGained;
@@ -428,12 +465,13 @@
         }
 
         function saveData() {
+            // console.log('saving to local storage');
             localStorage.setItem('vibeBalance', userBalance);
             localStorage.setItem('vibePortfolio', JSON.stringify(myPortfolio));
             localStorage.setItem('vibeHistory', JSON.stringify(tradeHistory));
         }
 
-        // HOUR 13: Helper to render badges
+        // helper for badgess
         function getBadgeHTML(type) {
             if (type === 'L1') return `<span class="badge badge-l1">L1</span>`;
             if (type === 'MEME') return `<span class="badge badge-meme">MEME</span>`;
@@ -465,8 +503,10 @@
             const portContainer = document.getElementById('my-crypto-list');
             portContainer.innerHTML = "";
             let hasCoins = false;
+
             for (const [coinId, amount] of Object.entries(myPortfolio)) {
-                if (amount > 0.000001) { // had to lower this threshold because meme bags are huge numbers
+                // don't show dust
+                if (amount > 0.000001) {
                     hasCoins = true;
                     portContainer.innerHTML += `<div class="portfolio-item"><span style="color: var(--text-muted); font-weight: bold;">${coinId}</span><strong>${amount.toLocaleString('en-US', { maximumFractionDigits: 6 })}</strong></div>`;
                 }
@@ -481,6 +521,7 @@
                 histContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 14px; text-align: center; margin-top: 20px;">No recent trades.</p>`;
                 return;
             }
+
             tradeHistory.forEach(item => {
                 const colorClass = item.type === 'BUY' ? 'log-buy' : 'log-sell';
                 histContainer.innerHTML += `
@@ -492,9 +533,11 @@
             });
         }
 
+        // simulate live market movements
         function updatePrices() {
             for (let i = 0; i < coins.length; i++) {
                 let oldPrice = coins[i].price;
+                // random swing between -2% and +2%
                 let swing = 1 + (Math.random() * 0.04 - 0.02);
                 coins[i].price = oldPrice * swing;
 
@@ -510,16 +553,24 @@
                     }
                 }
             }
-            updateNetWorth();
+            updateNetWorth(); // update total bag value based on new prices
         }
 
+        // setInterval(updatePrices, 1000); // 1s was way too fast making it jumpy
         setInterval(updatePrices, 5000);
 
+        // init app
         updateTopUI();
         renderMarket();
         renderPortfolio();
         renderHistory();
         updateNetWorth();
+
+        // function testClearData() {
+        //     localStorage.clear();
+        //     console.log('wiped storage');
+        // }
     </script>
-</body>               
-</html>                                  
+</body>
+
+</html>                                                                                   J          
