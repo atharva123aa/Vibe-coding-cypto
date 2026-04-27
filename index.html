@@ -115,6 +115,13 @@
             gap: 24px;
         }
 
+        /* HOUR 15: Left Column wrapper */
+        .left-col {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
         .right-col {
             display: flex;
             flex-direction: column;
@@ -150,9 +157,8 @@
             border-radius: 6px;
         }
 
-        /* HOUR 14: Custom Scrollbar for the Market List */
         .coin-list-container {
-            max-height: 520px;
+            max-height: 400px;
             overflow-y: auto;
             padding-right: 10px;
         }
@@ -319,6 +325,28 @@
             padding: 4px 8px;
             border-radius: 4px;
         }
+
+        /* Leaderboard Specific CSS */
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .leaderboard-item:last-child {
+            border-bottom: none;
+        }
+
+        .rank-me {
+            color: var(--accent-green);
+            font-weight: bold;
+            background: rgba(14, 203, 129, 0.05);
+            padding: 8px;
+            border-radius: 6px;
+            margin: 4px 0;
+        }
     </style>
 </head>
 
@@ -329,7 +357,8 @@
                 <h2>⚡ VibeTrade</h2>
             </div>
             <ul class="nav-links">
-                <li class="active">📊 Market Data</li>
+                <li class="active" id="nav-dashboard" onclick="switchTab('dashboard')">📊 Market Data</li>
+                <li id="nav-leaderboard" onclick="switchTab('leaderboard')">🏆 Leaderboard</li>
                 <!-- <li>💸 Send Crypto</li> -->
                 <li>💼 Spot Wallet</li>
                 <li>⚙️ Settings</li>
@@ -346,11 +375,15 @@
                     <h2 id="usd-balance" class="mono-num">$0.00</h2>
                 </div>
             </header>
-            <section class="dashboard-grid">
-                <div class="panel">
-                    <h3>Live Markets</h3>
-                    <div class="coin-list-container" id="coin-list"></div>
+
+            <section class="dashboard-grid" id="dashboard-view">
+                <div class="left-col">
+                    <div class="panel">
+                        <h3>Live Markets</h3>
+                        <div class="coin-list-container" id="coin-list"></div>
+                    </div>
                 </div>
+
                 <div class="right-col">
                     <div class="panel">
                         <h3>Spot Portfolio 🎒 <span id="net-worth-display" class="net-worth-badge mono-num">$0.00</span>
@@ -363,10 +396,34 @@
                     </div>
                 </div>
             </section>
+
+            <!-- Leaderboard Separate View -->
+            <section id="leaderboard-view" style="display: none;">
+                <div class="panel">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3>Global Leaderboard 🏆</h3>
+                        <!-- TODO: redirect button back -->
+                        <button class="btn" style="background: var(--border-color); color: var(--text-main);"
+                            onclick="switchTab('dashboard')">← Back</button>
+                    </div>
+                    <div id="leaderboard-list"></div>
+                </div>
+            </section>
         </main>
     </div>
 
     <script>
+        // Simple tab switcher
+        function switchTab(tabId) {
+            // console.log("switching to", tabId);
+            document.getElementById('dashboard-view').style.display = (tabId === 'dashboard') ? 'grid' : 'none';
+            document.getElementById('leaderboard-view').style.display = (tabId === 'leaderboard') ? 'block' : 'none';
+
+            document.getElementById('nav-dashboard').classList.toggle('active', tabId === 'dashboard');
+            document.getElementById('nav-leaderboard').classList.toggle('active', tabId === 'leaderboard');
+        }
+
         // TODO: maybe connect this to coingecko API later? hardcoded for now
         const coins = [
             { id: 'BTC', name: 'Bitcoin', price: 62000.50, icon: '₿', type: 'L1' },
@@ -378,6 +435,14 @@
             { id: 'SHIB', name: 'Shiba Inu', price: 0.000025, icon: '🐶', type: 'MEME' },
             { id: 'PEPE', name: 'Pepe', price: 0.000008, icon: '🐸', type: 'MEME' },
             { id: 'FLOKI', name: 'Floki', price: 0.0002, icon: '🛡️', type: 'MEME' }
+        ];
+
+        // HOUR 15: Fake Rival Bots Array
+        const bots = [
+            { name: 'Satoshi_Nakamoto', worth: 85400.00 },
+            { name: 'Vibecoding_Master', worth: 15420.50 },
+            { name: 'DiamondHands', worth: 11200.75 },
+            { name: 'PaperHands_Timmy', worth: 2100.10 }
         ];
 
         // console.log("loading app...");
@@ -395,6 +460,35 @@
             document.getElementById('usd-balance').innerText = "$" + userBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
+        // HOUR 15: Leaderboard Sorting Engine
+        function renderLeaderboard(myNetWorth) {
+            // Combine fake bots with actual user data dynamically
+            let allTraders = [...bots, { name: 'YOU', worth: myNetWorth, isMe: true }];
+
+            // Sort highest to lowest net worth
+            allTraders.sort((a, b) => b.worth - a.worth);
+
+            const lbContainer = document.getElementById('leaderboard-list');
+            lbContainer.innerHTML = "";
+
+            allTraders.forEach((trader, index) => {
+                let rank = index + 1;
+                let isMeClass = trader.isMe ? 'rank-me' : '';
+                let icon = rank === 1 ? '👑' : (rank === 2 ? '🥈' : (rank === 3 ? '🥉' : '👤'));
+
+                lbContainer.innerHTML += `
+                    <div class="leaderboard-item ${isMeClass}">
+                        <div>
+                            <span style="margin-right: 10px; font-size: 16px;">${icon}</span> 
+                            <strong>#${rank}</strong> 
+                            <span style="margin-left: 5px; color: ${trader.isMe ? 'var(--accent-green)' : 'var(--text-muted)'};">${trader.name}</span>
+                        </div>
+                        <div class="mono-num">$${trader.worth.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                    </div>
+                `;
+            });
+        }
+
         function updateNetWorth() {
             let totalCryptoValue = 0;
             for (const [coinId, amount] of Object.entries(myPortfolio)) {
@@ -406,6 +500,9 @@
             let netWorth = userBalance + totalCryptoValue;
             // update the UI element
             document.getElementById('net-worth-display').innerText = "$" + netWorth.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            // Pass live net worth into leaderboard engine
+            renderLeaderboard(netWorth);
         }
 
         function addToHistory(type, amount, coinId, price) {
@@ -553,6 +650,12 @@
                     }
                 }
             }
+
+            // Randomly shift the bot's net worth slightly to simulate them trading too!
+            bots.forEach(bot => {
+                bot.worth = bot.worth * (1 + (Math.random() * 0.01 - 0.005));
+            });
+
             updateNetWorth(); // update total bag value based on new prices
         }
 
@@ -572,5 +675,5 @@
         // }
     </script>
 </body>
-
-</html>                                                                                   J          
+ 
+</html>        
